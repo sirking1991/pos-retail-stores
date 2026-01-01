@@ -1,6 +1,5 @@
 import { createClient } from "@/lib/supabase/server"
 import { DashboardStats } from "@/components/dashboard-stats"
-import { Navigation } from "@/components/navigation"
 
 export default async function Page() {
   const supabase = await createClient()
@@ -38,17 +37,14 @@ export default async function Page() {
     allProducts?.filter((product) => product.stock_quantity <= product.reorder_level).slice(0, 5) || []
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navigation />
-      <main className="container mx-auto px-4 py-6 max-w-6xl">
-        <h1 className="text-3xl font-bold mb-8 text-balance">Dashboard</h1>
-        <DashboardStats
-          todaySales={todaySalesTotal}
-          todayPurchases={todayPurchasesTotal}
-          todayExpenses={todayExpensesTotal}
-          lowStockProducts={lowStockProducts}
-        />
-      </main>
-    </div>
+    <main className="container mx-auto px-4 py-6 max-w-6xl">
+      <h1 className="text-3xl font-bold mb-8 text-balance">Dashboard</h1>
+      <DashboardStats
+        todaySales={todaySalesTotal}
+        todayPurchases={todayPurchasesTotal}
+        todayExpenses={todayExpensesTotal}
+        lowStockProducts={lowStockProducts}
+      />
+    </main>
   )
 }

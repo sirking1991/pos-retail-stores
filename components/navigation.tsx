@@ -21,7 +21,7 @@ export function Navigation() {
     <nav className="sticky top-0 z-50 bg-primary text-primary-foreground shadow-lg">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between py-4">
-          <h1 className="text-xl font-bold">Moto Parts POS</h1>
+          <h1 className="text-xl font-bold">Simple Retail POS</h1>
         </div>
         <div className="flex overflow-x-auto gap-1 pb-3 -mx-4 px-4">
           {links.map((link) => {

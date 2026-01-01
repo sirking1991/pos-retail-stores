@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Textarea } from "@/components/ui/textarea"
 import { Check, Plus, X, Search } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 
@@ -35,6 +36,12 @@ export function SalesForm({ products }: SalesFormProps) {
   const [cart, setCart] = useState<CartItem[]>([])
   const [customerName, setCustomerName] = useState("")
   const [paymentMethod, setPaymentMethod] = useState("cash")
+  const [paymentDetails, setPaymentDetails] = useState({
+    transactionReference: "",
+    cardLast4: "",
+    bankName: "",
+    remarks: "",
+  })
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedProductForModal, setSelectedProductForModal] = useState<Product | null>(null)
@@ -74,6 +81,47 @@ export function SalesForm({ products }: SalesFormProps) {
     setCart(cart.filter((item) => item.product.id !== productId))
   }
 
+  const handlePaymentMethodChange = (value: string) => {
+    setPaymentMethod(value)
+    // Reset payment details when switching to cash
+    if (value === "cash") {
+      setPaymentDetails({
+        transactionReference: "",
+        cardLast4: "",
+        bankName: "",
+        remarks: "",
+      })
+    }
+  }
+
+  const buildPaymentNotes = () => {
+    if (paymentMethod === "cash") return null
+
+    const details: string[] = []
+
+    if (paymentMethod === "card") {
+      if (paymentDetails.transactionReference) {
+        details.push(`Transaction Ref: ${paymentDetails.transactionReference}`)
+      }
+      if (paymentDetails.cardLast4) {
+        details.push(`Card: ****${paymentDetails.cardLast4}`)
+      }
+    } else if (paymentMethod === "bank_transfer") {
+      if (paymentDetails.transactionReference) {
+        details.push(`Transaction Ref: ${paymentDetails.transactionReference}`)
+      }
+      if (paymentDetails.bankName) {
+        details.push(`Bank: ${paymentDetails.bankName}`)
+      }
+    }
+
+    if (paymentDetails.remarks) {
+      details.push(`Remarks: ${paymentDetails.remarks}`)
+    }
+
+    return details.length > 0 ? details.join(", ") : null
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (cart.length === 0) return
@@ -82,6 +130,9 @@ export function SalesForm({ products }: SalesFormProps) {
     const supabase = createClient()
 
     try {
+      // Build payment notes
+      const paymentNotes = buildPaymentNotes()
+
       // Insert all cart items as separate sales records
       const salesData = cart.map((item) => ({
         product_id: item.product.id,
@@ -90,6 +141,7 @@ export function SalesForm({ products }: SalesFormProps) {
         total_amount: item.product.selling_price * item.quantity,
         customer_name: customerName || null,
         payment_method: paymentMethod,
+        notes: paymentNotes || null,
       }))
 
       const { error } = await supabase.from("sales").insert(salesData)
@@ -104,6 +156,12 @@ export function SalesForm({ products }: SalesFormProps) {
       setCart([])
       setCustomerName("")
       setPaymentMethod("cash")
+      setPaymentDetails({
+        transactionReference: "",
+        cardLast4: "",
+        bankName: "",
+        remarks: "",
+      })
 
       // Refresh the page to update recent sales and dashboard
       router.refresh()
@@ -280,7 +338,7 @@ export function SalesForm({ products }: SalesFormProps) {
                 <Label htmlFor="payment" className="text-lg">
                   Payment Method
                 </Label>
-                <Select value={paymentMethod} onValueChange={setPaymentMethod}>
+                <Select value={paymentMethod} onValueChange={handlePaymentMethodChange}>
                   <SelectTrigger id="payment" className="h-14 text-lg">
                     <SelectValue />
                   </SelectTrigger>
@@ -297,6 +355,111 @@ export function SalesForm({ products }: SalesFormProps) {
                   </SelectContent>
                 </Select>
               </div>
+
+              {paymentMethod !== "cash" && (
+                <div className="space-y-4 p-4 border rounded-lg bg-accent/20">
+                  {paymentMethod === "card" && (
+                    <>
+                      <div className="space-y-2">
+                        <Label htmlFor="transaction-reference" className="text-lg">
+                          Transaction Reference
+                        </Label>
+                        <Input
+                          id="transaction-reference"
+                          type="text"
+                          value={paymentDetails.transactionReference}
+                          onChange={(e) =>
+                            setPaymentDetails({ ...paymentDetails, transactionReference: e.target.value })
+                          }
+                          className="h-14 text-lg"
+                          placeholder="Enter transaction reference"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="card-last4" className="text-lg">
+                          Card Last 4 Digits (Optional)
+                        </Label>
+                        <Input
+                          id="card-last4"
+                          type="text"
+                          maxLength={4}
+                          value={paymentDetails.cardLast4}
+                          onChange={(e) => {
+                            const value = e.target.value.replace(/\D/g, "").slice(0, 4)
+                            setPaymentDetails({ ...paymentDetails, cardLast4: value })
+                          }}
+                          className="h-14 text-lg"
+                          placeholder="1234"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="remarks" className="text-lg">
+                          Remarks (Optional)
+                        </Label>
+                        <Textarea
+                          id="remarks"
+                          value={paymentDetails.remarks}
+                          onChange={(e) =>
+                            setPaymentDetails({ ...paymentDetails, remarks: e.target.value })
+                          }
+                          className="min-h-[100px] text-lg"
+                          placeholder="Enter any additional remarks"
+                        />
+                      </div>
+                    </>
+                  )}
+
+                  {paymentMethod === "bank_transfer" && (
+                    <>
+                      <div className="space-y-2">
+                        <Label htmlFor="transaction-reference" className="text-lg">
+                          Transaction Reference <span className="text-red-500">*</span>
+                        </Label>
+                        <Input
+                          id="transaction-reference"
+                          type="text"
+                          value={paymentDetails.transactionReference}
+                          onChange={(e) =>
+                            setPaymentDetails({ ...paymentDetails, transactionReference: e.target.value })
+                          }
+                          className="h-14 text-lg"
+                          placeholder="Enter transaction reference"
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="bank-name" className="text-lg">
+                          Bank Name (Optional)
+                        </Label>
+                        <Input
+                          id="bank-name"
+                          type="text"
+                          value={paymentDetails.bankName}
+                          onChange={(e) =>
+                            setPaymentDetails({ ...paymentDetails, bankName: e.target.value })
+                          }
+                          className="h-14 text-lg"
+                          placeholder="Enter bank name"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="remarks" className="text-lg">
+                          Remarks (Optional)
+                        </Label>
+                        <Textarea
+                          id="remarks"
+                          value={paymentDetails.remarks}
+                          onChange={(e) =>
+                            setPaymentDetails({ ...paymentDetails, remarks: e.target.value })
+                          }
+                          className="min-h-[100px] text-lg"
+                          placeholder="Enter any additional remarks"
+                        />
+                      </div>
+                    </>
+                  )}
+                </div>
+              )}
 
               <div className="pt-4 border-t">
                 <div className="flex justify-between items-center mb-4">

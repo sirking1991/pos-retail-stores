@@ -1,5 +1,4 @@
 import { createClient } from "@/lib/supabase/server"
-import { Navigation } from "@/components/navigation"
 import { ReportsView } from "@/components/reports-view"
 import { startOfDay, startOfWeek, startOfMonth, subDays } from "date-fns"
 
@@ -91,18 +90,15 @@ export default async function ReportsPage() {
   const slowMoving = productPerformance.slice(-10).reverse()
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navigation />
-      <main className="container mx-auto px-4 py-6 max-w-6xl">
-        <h1 className="text-3xl font-bold mb-6 text-balance">Reports & Analytics</h1>
-        <ReportsView
-          salesData={salesData}
-          purchasesData={purchasesData}
-          expensesData={expensesData}
-          fastMoving={fastMoving}
-          slowMoving={slowMoving}
-        />
-      </main>
-    </div>
+    <main className="container mx-auto px-4 py-6 max-w-6xl">
+      <h1 className="text-3xl font-bold mb-6 text-balance">Reports & Analytics</h1>
+      <ReportsView
+        salesData={salesData}
+        purchasesData={purchasesData}
+        expensesData={expensesData}
+        fastMoving={fastMoving}
+        slowMoving={slowMoving}
+      />
+    </main>
   )
 }
