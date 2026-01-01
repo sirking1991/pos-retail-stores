@@ -26,7 +26,11 @@ const expenseCategories = [
   "Other",
 ]
 
-export function ExpenseForm() {
+interface ExpenseFormProps {
+  storeId: string
+}
+
+export function ExpenseForm({ storeId }: ExpenseFormProps) {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [showSuccess, setShowSuccess] = useState(false)
@@ -42,6 +46,7 @@ export function ExpenseForm() {
 
     try {
       const { error } = await supabase.from("expenses").insert({
+        store_id: storeId,
         category,
         amount: Number(amount),
         description: description || null,

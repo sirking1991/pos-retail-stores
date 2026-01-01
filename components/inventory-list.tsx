@@ -22,9 +22,10 @@ interface Product {
 
 interface InventoryListProps {
   products: Product[]
+  storeId: string
 }
 
-export function InventoryList({ products }: InventoryListProps) {
+export function InventoryList({ products, storeId }: InventoryListProps) {
   const [searchTerm, setSearchTerm] = useState("")
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
@@ -200,7 +201,12 @@ export function InventoryList({ products }: InventoryListProps) {
       </Card>
 
       {/* Product Form Modal */}
-      <ProductFormModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} product={editingProduct} />
+      <ProductFormModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        product={editingProduct}
+        storeId={storeId}
+      />
     </div>
   )
 }

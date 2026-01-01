@@ -22,6 +22,7 @@ interface Product {
 
 interface SalesFormProps {
   products: Product[]
+  storeId: string
 }
 
 interface CartItem {
@@ -29,7 +30,7 @@ interface CartItem {
   quantity: number
 }
 
-export function SalesForm({ products }: SalesFormProps) {
+export function SalesForm({ products, storeId }: SalesFormProps) {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [showSuccess, setShowSuccess] = useState(false)
@@ -135,6 +136,7 @@ export function SalesForm({ products }: SalesFormProps) {
 
       // Insert all cart items as separate sales records
       const salesData = cart.map((item) => ({
+        store_id: storeId,
         product_id: item.product.id,
         quantity: item.quantity,
         selling_price: item.product.selling_price,

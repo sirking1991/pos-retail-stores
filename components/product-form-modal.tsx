@@ -27,9 +27,10 @@ interface ProductFormModalProps {
   isOpen: boolean
   onClose: () => void
   product: Product | null
+  storeId: string
 }
 
-export function ProductFormModal({ isOpen, onClose, product }: ProductFormModalProps) {
+export function ProductFormModal({ isOpen, onClose, product, storeId }: ProductFormModalProps) {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -77,7 +78,7 @@ export function ProductFormModal({ isOpen, onClose, product }: ProductFormModalP
     try {
       const supabase = createClient()
 
-      const productData = {
+      const productData: any = {
         name: formData.name,
         description: formData.description || null,
         category: formData.category || null,
@@ -86,6 +87,10 @@ export function ProductFormModal({ isOpen, onClose, product }: ProductFormModalP
         selling_price: Number.parseFloat(formData.selling_price),
         stock_quantity: Number.parseInt(formData.stock_quantity),
         reorder_level: Number.parseInt(formData.reorder_level),
+      }
+
+      if (!product) {
+        productData.store_id = storeId
       }
 
       if (product) {

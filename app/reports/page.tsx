@@ -1,8 +1,16 @@
 import { createClient } from "@/lib/supabase/server"
 import { ReportsView } from "@/components/reports-view"
 import { startOfDay, startOfWeek, startOfMonth, subDays } from "date-fns"
+import { getAuthSession } from "@/lib/auth"
+import { redirect } from "next/navigation"
 
 export default async function ReportsPage() {
+  const session = await getAuthSession()
+
+  if (!session.isLoggedIn || !session.storeId) {
+    redirect("/login")
+  }
+
   const supabase = await createClient()
 
   // Calculate date ranges
@@ -10,43 +18,70 @@ export default async function ReportsPage() {
   const todayStart = startOfDay(now).toISOString()
   const weekStart = startOfWeek(now, { weekStartsOn: 1 }).toISOString()
   const monthStart = startOfMonth(now).toISOString()
-  const last7DaysStart = startOfDay(subDays(now, 6)).toISOString()
   const last30DaysStart = startOfDay(subDays(now, 29)).toISOString()
 
   // Fetch sales data
-  const { data: todaySales } = await supabase.from("sales").select("total_amount").gte("sale_date", todayStart)
+  const { data: todaySales } = await supabase
+    .from("sales")
+    .select("total_amount")
+    .eq("store_id", session.storeId)
+    .gte("sale_date", todayStart)
 
-  const { data: weekSales } = await supabase.from("sales").select("total_amount").gte("sale_date", weekStart)
+  const { data: weekSales } = await supabase
+    .from("sales")
+    .select("total_amount")
+    .eq("store_id", session.storeId)
+    .gte("sale_date", weekStart)
 
-  const { data: monthSales } = await supabase.from("sales").select("total_amount").gte("sale_date", monthStart)
+  const { data: monthSales } = await supabase
+    .from("sales")
+    .select("total_amount")
+    .eq("store_id", session.storeId)
+    .gte("sale_date", monthStart)
 
   // Fetch purchases data
   const { data: todayPurchases } = await supabase
     .from("purchases")
     .select("total_amount")
+    .eq("store_id", session.storeId)
     .gte("purchase_date", todayStart)
 
   const { data: weekPurchases } = await supabase
     .from("purchases")
     .select("total_amount")
+    .eq("store_id", session.storeId)
     .gte("purchase_date", weekStart)
 
   const { data: monthPurchases } = await supabase
     .from("purchases")
     .select("total_amount")
+    .eq("store_id", session.storeId)
     .gte("purchase_date", monthStart)
 
   // Fetch expenses data
-  const { data: todayExpenses } = await supabase.from("expenses").select("amount").gte("expense_date", todayStart)
+  const { data: todayExpenses } = await supabase
+    .from("expenses")
+    .select("amount")
+    .eq("store_id", session.storeId)
+    .gte("expense_date", todayStart)
 
-  const { data: weekExpenses } = await supabase.from("expenses").select("amount").gte("expense_date", weekStart)
+  const { data: weekExpenses } = await supabase
+    .from("expenses")
+    .select("amount")
+    .eq("store_id", session.storeId)
+    .gte("expense_date", weekStart)
 
-  const { data: monthExpenses } = await supabase.from("expenses").select("amount").gte("expense_date", monthStart)
+  const { data: monthExpenses } = await supabase
+    .from("expenses")
+    .select("amount")
+    .eq("store_id", session.storeId)
+    .gte("expense_date", monthStart)
 
   // Fetch product performance (last 30 days)
   const { data: productSales } = await supabase
     .from("sales")
-    .select("product_id, quantity, products(name)")
+    .select("product_id, quantity, products!inner(name)")
+    .eq("store_id", session.storeId)
     .gte("sale_date", last30DaysStart)
 
   // Calculate totals
@@ -71,9 +106,10 @@ export default async function ReportsPage() {
   // Calculate product performance
   const productPerformanceMap = new Map<string, { name: string; totalQuantity: number; salesCount: number }>()
 
-  productSales?.forEach((sale: { product_id: string; quantity: number; products: { name: string } | null }) => {
+  productSales?.forEach((sale: any) => {
+    const productInfo = Array.isArray(sale.products) ? sale.products[0] : sale.products
     const current = productPerformanceMap.get(sale.product_id) || {
-      name: sale.products?.name || "Unknown",
+      name: productInfo?.name || "Unknown",
       totalQuantity: 0,
       salesCount: 0,
     }

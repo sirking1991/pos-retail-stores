@@ -20,6 +20,7 @@ interface Product {
 
 interface PurchaseFormProps {
   products: Product[]
+  storeId: string
 }
 
 interface CartItem {
@@ -28,7 +29,7 @@ interface CartItem {
   cost_price: number
 }
 
-export function PurchaseForm({ products }: PurchaseFormProps) {
+export function PurchaseForm({ products, storeId }: PurchaseFormProps) {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [showSuccess, setShowSuccess] = useState(false)
@@ -84,6 +85,7 @@ export function PurchaseForm({ products }: PurchaseFormProps) {
 
     try {
       const purchases = cart.map((item) => ({
+        store_id: storeId,
         product_id: item.product.id,
         quantity: item.quantity,
         cost_price: item.cost_price,
