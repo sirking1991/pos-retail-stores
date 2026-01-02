@@ -16,7 +16,6 @@ import {
     FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { toast } from "sonner"
 import { createClient } from "@/lib/supabase/client"
 import { generateUniqueStoreCode, generateUniqueUserCode } from "@/lib/codes"
@@ -136,22 +135,18 @@ export function RegisterForm() {
     }
 
     return (
-        <Card className="w-full max-w-md mx-auto">
-            <CardHeader>
-                <CardTitle>Register Account</CardTitle>
-                <CardDescription>Create your business account and first store.</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <div className="w-full">
+            <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <FormField
                             control={form.control}
                             name="accountName"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Business/Account Name</FormLabel>
+                                    <FormLabel className="text-foreground/70 text-xs uppercase tracking-wider font-semibold">Business Name</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="Acme Corp" {...field} />
+                                        <Input placeholder="Acme Corp" className="h-11 border-muted-foreground/20 focus-visible:ring-primary" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -162,22 +157,26 @@ export function RegisterForm() {
                             name="storeName"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>First Store Name</FormLabel>
+                                    <FormLabel className="text-foreground/70 text-xs uppercase tracking-wider font-semibold">First Store Name</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="Main Branch" {...field} />
+                                        <Input placeholder="Main Branch" className="h-11 border-muted-foreground/20 focus-visible:ring-primary" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )}
                         />
+                    </div>
+
+                    <div className="p-4 rounded-xl bg-muted/30 border border-muted-foreground/10 space-y-4">
+                        <h3 className="text-sm font-semibold text-foreground/80">Administrator Details</h3>
                         <FormField
                             control={form.control}
                             name="adminName"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Admin Full Name</FormLabel>
+                                    <FormLabel className="text-foreground/70 text-xs uppercase tracking-wider font-bold">Admin Full Name</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="John Doe" {...field} />
+                                        <Input placeholder="John Doe" className="h-11 border-muted-foreground/20 bg-background focus-visible:ring-primary" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -188,9 +187,9 @@ export function RegisterForm() {
                             name="adminEmail"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Admin Email</FormLabel>
+                                    <FormLabel className="text-foreground/70 text-xs uppercase tracking-wider font-bold">Admin Email</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="admin@example.com" {...field} />
+                                        <Input placeholder="admin@example.com" className="h-11 border-muted-foreground/20 bg-background focus-visible:ring-primary" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -201,26 +200,27 @@ export function RegisterForm() {
                             name="password"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Password</FormLabel>
+                                    <FormLabel className="text-foreground/70 text-xs uppercase tracking-wider font-bold">Password</FormLabel>
                                     <FormControl>
-                                        <Input type="password" placeholder="******" {...field} />
+                                        <Input type="password" placeholder="******" className="h-11 border-muted-foreground/20 bg-background focus-visible:ring-primary" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )}
                         />
-                        <Button type="submit" className="w-full" disabled={isLoading}>
-                            {isLoading ? "Registering..." : "Create Account"}
-                        </Button>
-                    </form>
-                </Form>
-                <div className="mt-4 text-center text-sm">
-                    Already have an account?{" "}
-                    <Link href="/login" className="text-primary hover:underline">
-                        Login here
-                    </Link>
-                </div>
-            </CardContent>
-        </Card>
+                    </div>
+
+                    <Button type="submit" className="w-full h-12 text-base font-semibold transition-all duration-200 hover:scale-[1.01] active:scale-[0.99]" disabled={isLoading}>
+                        {isLoading ? "Creating Business Profile..." : "Complete Registration"}
+                    </Button>
+                </form>
+            </Form>
+            <div className="mt-8 text-center text-sm text-muted-foreground">
+                Already have an account?{" "}
+                <Link href="/login" className="text-primary font-semibold hover:underline underline-offset-4">
+                    Sign in to your store
+                </Link>
+            </div>
+        </div>
     )
 }

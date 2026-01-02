@@ -9,8 +9,8 @@ const _geist = Geist({ subsets: ["latin"] })
 const _geistMono = Geist_Mono({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Retail POS System",
-  description: "Point of Sale system for retail shops",
+  title: "BizWerks POS for Retail Stores",
+  description: "Point of Sale system for retail stores",
   generator: "v0.app",
   manifest: "/manifest.json",
   icons: {

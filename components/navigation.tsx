@@ -37,11 +37,26 @@ export function Navigation() {
   }, [pathname, isAuthPage])
 
   const handleLogout = async () => {
-    const res = await fetch("/api/auth/logout", { method: "POST" })
-    if (res.ok) {
-      toast.success("Logged out successfully")
+    try {
+      const res = await fetch("/api/auth/logout", { method: "POST" })
+      if (res.ok) {
+        toast.success("Logged out successfully")
+        // Clear all states
+        setStoreName(null)
+        setAccountName(null)
+        setIsAdmin(false)
+
+        // Refresh and redirect
+        router.push("/login")
+        router.refresh()
+      } else {
+        throw new Error("Logout failed")
+      }
+    } catch (error) {
+      console.error("Logout error:", error)
+      toast.error("Failed to logout. Please try again.")
+      // Fallback redirect even if API fails, to clear client state
       router.push("/login")
-      router.refresh()
     }
   }
 
@@ -67,7 +82,7 @@ export function Navigation() {
         <div className="flex items-center justify-between py-4">
           <div className="flex items-center gap-2">
             <h1 className="text-xl font-bold">
-              {accountName && storeName ? `${accountName} | ${storeName}` : "Simple Retail POS"}
+              {accountName && storeName ? `${accountName} | ${storeName}` : "BizWerks POS for Retail Stores"}
             </h1>
           </div>
           <div className="flex items-center gap-4">

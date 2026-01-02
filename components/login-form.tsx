@@ -16,7 +16,6 @@ import {
     FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { toast } from "sonner"
 import { createClient } from "@/lib/supabase/client"
 
@@ -95,57 +94,55 @@ export function LoginForm() {
     }
 
     return (
-        <Card className="w-full max-w-md mx-auto">
-            <CardHeader>
-                <CardTitle>POS Login</CardTitle>
-                <CardDescription>Enter your store and user codes to access the system.</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                        <FormField
-                            control={form.control}
-                            name="storeCode"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Store Code</FormLabel>
-                                    <FormControl>
-                                        <Input placeholder="ABCDE" className="uppercase font-mono text-lg tracking-widest" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="userCode"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>User Code</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            type="password"
-                                            placeholder="*****"
-                                            className="uppercase font-mono text-lg tracking-widest"
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <Button type="submit" className="w-full" disabled={isLoading}>
-                            {isLoading ? "Logging in..." : "Login"}
-                        </Button>
-                    </form>
-                </Form>
-                <div className="mt-4 text-center text-sm">
-                    Don&apos;t have an account?{" "}
-                    <Link href="/register" className="text-primary hover:underline">
-                        Register here
-                    </Link>
-                </div>
-            </CardContent>
-        </Card>
+        <div className="w-full">
+            <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                    <FormField
+                        control={form.control}
+                        name="storeCode"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel className="text-foreground/70">Store Code</FormLabel>
+                                <FormControl>
+                                    <Input
+                                        placeholder="ABCDE"
+                                        className="uppercase font-mono text-xl tracking-[0.2em] h-12 border-muted-foreground/20 focus-visible:ring-primary transition-all duration-200"
+                                        {...field}
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="userCode"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel className="text-foreground/70">User Code</FormLabel>
+                                <FormControl>
+                                    <Input
+                                        type="password"
+                                        placeholder="*****"
+                                        className="uppercase font-mono text-xl tracking-[0.2em] h-12 border-muted-foreground/20 focus-visible:ring-primary transition-all duration-200"
+                                        {...field}
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <Button type="submit" className="w-full h-12 text-base font-semibold transition-all duration-200 hover:scale-[1.01] active:scale-[0.99]" disabled={isLoading}>
+                        {isLoading ? "Logging in..." : "Continue to Dashboard"}
+                    </Button>
+                </form>
+            </Form>
+            <div className="mt-8 text-center text-sm text-muted-foreground">
+                Don&apos;t have an account?{" "}
+                <Link href="/register" className="text-primary font-semibold hover:underline underline-offset-4">
+                    Register your business
+                </Link>
+            </div>
+        </div>
     )
 }
