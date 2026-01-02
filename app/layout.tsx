@@ -12,6 +12,7 @@ export const metadata: Metadata = {
   title: "Retail POS System",
   description: "Point of Sale system for retail shops",
   generator: "v0.app",
+  manifest: "/manifest.json",
   icons: {
     icon: [
       {
